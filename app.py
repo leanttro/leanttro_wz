@@ -456,11 +456,6 @@ def login_obrigatorio(f):
             if api:
                 return jsonify(ok=False, erro="Sessão expirada. Entre de novo."), 401
             return redirect("/login" + (f"?next={request.full_path.rstrip('?')}" if request.method == "GET" else ""))
-        if u.trocar_senha and request.endpoint not in ("conta", "conta_senha", "sair"):
-            if api:
-                return jsonify(ok=False, erro="Defina uma nova senha antes de continuar."), 403
-            flash("Defina uma nova senha para continuar.", "aviso")
-            return redirect("/conta")
         return f(*a, **k)
     return wrapper
 
