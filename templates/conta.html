@@ -24,23 +24,46 @@ a{color:var(--v2);font-weight:700}
 small.d{display:block;color:var(--mu);font-size:12px;margin-top:4px}
 @media(max-width:480px){.wrap{margin:14px auto}.card{padding:18px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-</style></head><body><div class="topo" style="display:flex;align-items:center;min-height:68px"><a href="/" aria-label="{{ app_nome }}" style="display:flex"><img src="/logo.png" alt="{{ app_nome }}" style="height:52px;width:auto;display:block;filter:brightness(0) invert(1)"></a></div><main class="wrap"><div class="card"><h1>Minha conta</h1><p class="sub">{{ u.nome }} · {{ u.email }}</p>{% for c, m in get_flashed_messages(with_categories=true) %}<div class="msg {{ c }}" role="alert">{{ m }}</div>{% endfor %}
-{% if u.trocar_senha %}<div class="msg aviso">Troque a senha temporária para continuar.</div>{% else %}<a class="btn sec" href="/app" style="margin-bottom:6px">← Voltar ao app</a>{% endif %}
-<h2 style="margin-top:20px">Nome</h2>
-<form method="post" action="/conta/nome"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="text" name="nome" value="{{ u.nome }}" maxlength="80" required aria-label="Nome"><button class="full" type="submit" style="margin-top:10px">Salvar nome</button></form>
-<h2 style="margin-top:26px">Trocar senha</h2>
+</style><style>
+.cx{max-width:940px;margin:22px auto 40px;padding:0 16px;display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:start}
+.lado{position:sticky;top:14px;background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 3px #0002}
+.av{width:64px;height:64px;border-radius:50%;background:var(--v2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;margin-bottom:12px}
+.lado b{display:block;font-size:16px;word-break:break-word}.lado span{color:var(--mu);font-size:13px;word-break:break-all}
+.lado nav{margin-top:16px;display:flex;flex-direction:column;gap:2px}
+.lado nav a{padding:9px 10px;border-radius:8px;text-decoration:none;color:var(--tx);font-weight:600;font-size:14px}.lado nav a:hover{background:#eef3f1}
+.sec{background:#fff;border-radius:14px;box-shadow:0 1px 3px #0002;margin-bottom:16px;overflow:hidden;scroll-margin-top:14px}
+.sec>header{padding:16px 20px;border-bottom:1px solid var(--ln)}.sec>header h2{margin:0;font-size:17px}.sec>header p{margin:3px 0 0;color:var(--mu);font-size:13.5px}
+.lin{display:grid;grid-template-columns:170px 1fr;gap:14px;padding:16px 20px;border-bottom:1px solid #ece8df;align-items:center}.lin:last-child{border-bottom:0}
+.lin>b{font-size:14px}.lin small{display:block;color:var(--mu);font-weight:400;font-size:12.5px;margin-top:2px}
+.il{display:flex;gap:8px;flex-wrap:wrap}.il input{flex:1;min-width:160px}
+.perigo-sec{border:1.5px solid #f0c9c5}.perigo-sec>header h2{color:var(--er)}
+.voltar{display:flex;gap:8px;align-items:center}
+@media(max-width:760px){.cx{grid-template-columns:1fr}.lado{position:static}.lado nav{flex-direction:row;flex-wrap:wrap}.lin{grid-template-columns:1fr;gap:8px}}
+</style></head><body>
+<div class="topo" style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:68px">
+<a href="/app" aria-label="{{ app_nome }}" style="display:flex"><img src="/logo.png" alt="{{ app_nome }}" style="height:52px;width:auto;display:block;filter:brightness(0) invert(1)"></a>
+<div class="voltar"><a class="btn sec peq" href="/app" style="padding:9px 14px">VOLTAR AO APP</a>
+<form method="post" action="/sair" style="margin:0"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="peq" type="submit" style="padding:9px 18px;font-weight:800;letter-spacing:.6px;background:#064c45">SAIR</button></form></div></div>
+<main class="cx">
+<aside class="lado"><div class="av">{{ (u.nome or '?')[:1]|upper }}</div><b>{{ u.nome }}</b><span>{{ u.email }}</span>
+<nav aria-label="Seções"><a href="#perfil">Perfil</a><a href="#seguranca">Segurança</a><a href="#dados">Meus dados</a><a href="#excluir">Excluir conta</a></nav></aside>
+<div>{% for c, m in get_flashed_messages(with_categories=true) %}<div class="msg {{ c }}" role="alert">{{ m }}</div>{% endfor %}
+{% if u.trocar_senha %}<div class="msg aviso">Você entrou com uma senha temporária. Quando quiser, crie a sua em <a href="#seguranca">Segurança</a>.</div>{% endif %}
+<section class="sec" id="perfil"><header><h2>Perfil</h2><p>Como você aparece na sua conta.</p></header>
+<div class="lin"><b>Nome</b><form method="post" action="/conta/nome" class="il"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="text" name="nome" value="{{ u.nome }}" maxlength="80" required aria-label="Nome"><button type="submit">Salvar</button></form></div>
+<div class="lin"><b>E-mail<small>Não pode ser alterado.</small></b><span>{{ u.email }}</span></div>
+<div class="lin"><b>Conta criada em</b><span>{{ u.criado_em|data_br(false) }}</span></div></section>
+<section class="sec" id="seguranca"><header><h2>Segurança</h2><p>Troque sua senha. Os outros aparelhos serão desconectados.</p></header>
 <form method="post" action="/conta/senha"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
-<label for="atual">Senha atual</label><input id="atual" type="password" name="atual" required autocomplete="current-password">
-<label for="ns">Nova senha</label><input id="ns" type="password" name="senha" required minlength="8" autocomplete="new-password">
-<label for="cf">Repita a nova senha</label><input id="cf" type="password" name="confirmar" required minlength="8" autocomplete="new-password">
-<button class="full" type="submit">Trocar senha</button></form>
-{% if not u.trocar_senha %}<h2 style="margin-top:26px">Meus dados</h2><p class="sub">Baixe uma cópia de tudo que você guardou.</p>
-<a class="btn sec" href="/conta/exportar">Baixar meus dados (JSON)</a>{% endif %}
-<h2 style="margin-top:26px">Sair</h2>
-<form method="post" action="/sair"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="sec" type="submit">Sair da conta</button></form>
-<h2 style="margin-top:26px;color:var(--er)">Excluir minha conta</h2>
-<p class="sub">Apaga sua conta e todos os seus dados, sem volta.</p>
+<div class="lin"><b>Senha atual</b><input type="password" name="atual" required autocomplete="current-password"></div>
+<div class="lin"><b>Nova senha<small>Mínimo de 8 caracteres.</small></b><input type="password" name="senha" required minlength="8" autocomplete="new-password"></div>
+<div class="lin"><b>Repita a nova senha</b><input type="password" name="confirmar" required minlength="8" autocomplete="new-password"></div>
+<div class="lin"><span></span><div><button type="submit">Trocar senha</button></div></div></form></section>
+<section class="sec" id="dados"><header><h2>Meus dados</h2><p>Tudo o que você guardou é seu.</p></header>
+<div class="lin"><b>Baixar cópia<small>Arquivo JSON com tudo.</small></b><div><a class="btn sec" href="/conta/exportar">Baixar meus dados</a></div></div></section>
+<section class="sec perigo-sec" id="excluir"><header><h2>Excluir conta</h2><p>Apaga sua conta e todos os seus dados. Não tem volta.</p></header>
 <form method="post" action="/conta/excluir" onsubmit="return confirm('Excluir a conta e todos os dados? Não dá para desfazer.')"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
-<label for="ds">Sua senha</label><input id="ds" type="password" name="senha" required autocomplete="current-password">
-<label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" name="confirmo" value="1" required> Entendo que isso é definitivo</label>
-<button class="perigo full" type="submit">Excluir conta</button></form></div></main></body></html>
+<div class="lin"><b>Sua senha</b><input type="password" name="senha" required autocomplete="current-password"></div>
+<div class="lin"><span></span><label style="display:flex;gap:8px;align-items:center;font-weight:600;margin:0"><input type="checkbox" name="confirmo" value="1" required style="width:auto"> Entendo que isso é definitivo</label></div>
+<div class="lin"><span></span><div><button class="perigo" type="submit">Excluir minha conta</button></div></div></form></section>
+</div></main></body></html>
