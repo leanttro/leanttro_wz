@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#075e54"><link rel="icon" href="/logo.png"><title>Admin · {{ app_nome }}</title><style>
+:root{--v:#075e54;--v2:#128c7e;--ac:#25a884;--bg:#efeae2;--tx:#1b2a27;--mu:#6b7b77;--ln:#d9d4ca;--er:#b3261e;--erb:#fdecea;--okb:#e3f5ec;--avb:#fff4d6}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);line-height:1.45}
+.topo{background:var(--v);color:#fff;padding:14px 20px;font-weight:800;font-size:18px;letter-spacing:-.2px}
+.wrap{max-width:420px;margin:28px auto;padding:0 16px}
+.card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 1px 3px #0002}
+h1{font-size:21px;margin:0 0 4px;letter-spacing:-.3px}h2{font-size:16px;margin:0 0 10px}
+p.sub{margin:0 0 16px;color:var(--mu);font-size:14px}
+label{display:block;font-size:13px;font-weight:700;margin:14px 0 5px}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=search],select{width:100%;padding:11px 12px;border:1.5px solid var(--ln);border-radius:9px;font:inherit;font-size:15px;background:#fff;color:var(--tx)}
+input:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid #25a88455;border-color:var(--ac)}
+.cod{font-size:28px;letter-spacing:10px;text-align:center;font-weight:800}
+button,.btn{display:inline-block;border:0;border-radius:9px;background:var(--v2);color:#fff;font:inherit;font-weight:800;font-size:15px;padding:12px 16px;cursor:pointer;text-decoration:none;text-align:center}
+button:hover,.btn:hover{background:var(--v)}button.full{width:100%;margin-top:18px}
+button.sec,.btn.sec{background:#e9efec;color:var(--v)}button.sec:hover{background:#dbe5e1}
+button.perigo{background:var(--er)}button.perigo:hover{background:#8f1d17}
+button.peq{padding:6px 10px;font-size:12.5px;border-radius:7px}
+.msg{padding:10px 12px;border-radius:9px;font-size:14px;margin:0 0 14px}
+.msg.erro{background:var(--erb);color:#7a1612}.msg.ok{background:var(--okb);color:#0b5a36}.msg.aviso{background:var(--avb);color:#6b4b00}
+.links{margin-top:18px;font-size:14px;color:var(--mu);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+a{color:var(--v2);font-weight:700}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+small.d{display:block;color:var(--mu);font-size:12px;margin-top:4px}
+@media(max-width:480px){.wrap{margin:14px auto}.card{padding:18px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<header class="topo" style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+<span style="display:flex;align-items:center;gap:12px"><img src="/logo.png" alt="{{ app_nome }}" style="height:52px;width:auto;display:block;filter:brightness(0) invert(1)"><span>Admin</span></span>
+<form method="post" action="/admin/sair" style="margin:0"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="sec peq" type="submit">Sair ({{ admin.usuario }})</button></form></header>
+<main style="max-width:1100px;margin:18px auto;padding:0 14px">
+{% for c, m in get_flashed_messages(with_categories=true) %}<div class="msg {{ c }}" role="alert">{{ m }}</div>{% endfor %}
+{% if segredo %}<div class="msg ok" style="font-size:15px"><b>Conta {{ segredo.tipo }}.</b> Envie à pessoa (aparece só agora):<br>
+E-mail: <code>{{ segredo.email }}</code><br>Senha temporária: <code style="font-size:17px;font-weight:800">{{ segredo.senha }}</code><br>
+<small>Ela será obrigada a trocar a senha no primeiro acesso.</small></div>{% endif %}
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px">
+{% for rot, val in [('Total', (por_status.get('ativo',0)+por_status.get('pendente',0)+por_status.get('bloqueado',0))), ('Ativas', por_status.get('ativo',0)), ('Pendentes', por_status.get('pendente',0)), ('Bloqueadas', por_status.get('bloqueado',0)), ('Novas em 7 dias', novos7)] %}
+<div class="card" style="padding:14px"><div style="font-size:26px;font-weight:800">{{ val }}</div><div style="color:var(--mu);font-size:13px">{{ rot }}</div></div>{% endfor %}</div>
+<div class="card" style="margin-bottom:16px"><h2>Criar conta</h2>
+<form method="post" action="/admin/usuarios" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;align-items:end"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<div><label for="cn" style="margin-top:0">Nome</label><input id="cn" type="text" name="nome" required maxlength="80"></div>
+<div><label for="ce" style="margin-top:0">E-mail</label><input id="ce" type="email" name="email" required></div>
+<div><label for="cs" style="margin-top:0">Senha (vazio = gerar)</label><input id="cs" type="text" name="senha" autocomplete="off" placeholder="gerada automaticamente"></div>
+<button type="submit">Criar conta ativa</button></form></div>
+<div class="card" style="padding:16px">
+<form method="get" action="/admin" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+<input type="search" name="q" value="{{ q }}" placeholder="Buscar nome ou e-mail" style="flex:1;min-width:180px" aria-label="Buscar">
+<select name="status" style="width:auto" aria-label="Status"><option value="">Todos</option>{% for st in ['ativo','pendente','bloqueado'] %}<option value="{{ st }}" {{ 'selected' if status==st }}>{{ st|capitalize }}</option>{% endfor %}</select>
+<button type="submit">Filtrar</button></form>
+<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px;min-width:760px">
+<thead><tr style="text-align:left;color:var(--mu);font-size:12px"><th style="padding:8px">Conta</th><th>Status</th><th>Criada</th><th>Último login</th><th>Espaço</th><th>Ações</th></tr></thead><tbody>
+{% for x in usuarios %}<tr style="border-top:1px solid var(--ln);vertical-align:top">
+<td style="padding:10px 8px"><b>{{ x.nome }}</b>{% if x.criado_por_admin %} <small style="color:var(--mu)">(criada pelo admin)</small>{% endif %}<br><span style="color:var(--mu)">{{ x.email }}</span></td>
+<td><span style="padding:3px 8px;border-radius:99px;font-size:12px;font-weight:700;background:{{ {'ativo':'#e3f5ec','pendente':'#fff4d6','bloqueado':'#fdecea'}[x.status] }}">{{ x.status }}</span></td>
+<td>{{ x.criado_em|data_br(false) }}</td><td>{{ x.ultimo_login|data_br if x.ultimo_login else '—' }}</td>
+<td>{{ ((x.bytes or 0)/1024)|round(1) }} KB</td>
+<td><div style="display:flex;gap:6px;flex-wrap:wrap">
+{% if x.status=='bloqueado' %}<form method="post" action="/admin/usuarios/{{ x.id }}/desbloquear" style="margin:0"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="sec peq">Desbloquear</button></form>
+{% else %}<form method="post" action="/admin/usuarios/{{ x.id }}/bloquear" style="margin:0" onsubmit="return confirm('Bloquear e desconectar {{ x.email }}?')"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="sec peq">Bloquear</button></form>{% endif %}
+<form method="post" action="/admin/usuarios/{{ x.id }}/senha" style="margin:0" onsubmit="return confirm('Gerar nova senha temporária para {{ x.email }}?')"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="sec peq">Nova senha</button></form>
+<form method="post" action="/admin/usuarios/{{ x.id }}/excluir" style="margin:0;display:flex;gap:4px" onsubmit="return confirm('Excluir {{ x.email }} e todos os dados?')"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="text" name="confirmar" placeholder="digite o e-mail" required style="width:150px;padding:6px 8px;font-size:12.5px" aria-label="Confirmar e-mail para excluir"><button class="perigo peq">Excluir</button></form>
+</div></td></tr>{% else %}<tr><td colspan="6" style="padding:20px;color:var(--mu)">Nenhuma conta encontrada.</td></tr>{% endfor %}</tbody></table></div>
+{% set paginas = ((total + por_pagina - 1) // por_pagina) %}
+{% if paginas > 1 %}<div style="display:flex;gap:8px;align-items:center;margin-top:12px">
+{% if pagina > 1 %}<a class="btn sec peq" href="/admin?p={{ pagina-1 }}&q={{ q|urlencode }}&status={{ status }}">← Anterior</a>{% endif %}
+<span style="color:var(--mu);font-size:13px">Página {{ pagina }} de {{ paginas }} · {{ total }} contas</span>
+{% if pagina < paginas %}<a class="btn sec peq" href="/admin?p={{ pagina+1 }}&q={{ q|urlencode }}&status={{ status }}">Próxima →</a>{% endif %}</div>{% endif %}
+</div>
+<p style="color:var(--mu);font-size:12.5px;margin-top:12px">Por privacidade, este painel mostra só dados cadastrais e o espaço usado, nunca o conteúdo das pessoas.</p></main></body></html>

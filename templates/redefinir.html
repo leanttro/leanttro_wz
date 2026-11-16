@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#075e54"><link rel="icon" href="/logo.png"><title>Nova senha · {{ app_nome }}</title><style>
+:root{--v:#075e54;--v2:#128c7e;--ac:#25a884;--bg:#efeae2;--tx:#1b2a27;--mu:#6b7b77;--ln:#d9d4ca;--er:#b3261e;--erb:#fdecea;--okb:#e3f5ec;--avb:#fff4d6}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);line-height:1.45}
+.topo{background:var(--v);color:#fff;padding:14px 20px;font-weight:800;font-size:18px;letter-spacing:-.2px}
+.wrap{max-width:420px;margin:28px auto;padding:0 16px}
+.card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 1px 3px #0002}
+h1{font-size:21px;margin:0 0 4px;letter-spacing:-.3px}h2{font-size:16px;margin:0 0 10px}
+p.sub{margin:0 0 16px;color:var(--mu);font-size:14px}
+label{display:block;font-size:13px;font-weight:700;margin:14px 0 5px}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=search],select{width:100%;padding:11px 12px;border:1.5px solid var(--ln);border-radius:9px;font:inherit;font-size:15px;background:#fff;color:var(--tx)}
+input:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid #25a88455;border-color:var(--ac)}
+.cod{font-size:28px;letter-spacing:10px;text-align:center;font-weight:800}
+button,.btn{display:inline-block;border:0;border-radius:9px;background:var(--v2);color:#fff;font:inherit;font-weight:800;font-size:15px;padding:12px 16px;cursor:pointer;text-decoration:none;text-align:center}
+button:hover,.btn:hover{background:var(--v)}button.full{width:100%;margin-top:18px}
+button.sec,.btn.sec{background:#e9efec;color:var(--v)}button.sec:hover{background:#dbe5e1}
+button.perigo{background:var(--er)}button.perigo:hover{background:#8f1d17}
+button.peq{padding:6px 10px;font-size:12.5px;border-radius:7px}
+.msg{padding:10px 12px;border-radius:9px;font-size:14px;margin:0 0 14px}
+.msg.erro{background:var(--erb);color:#7a1612}.msg.ok{background:var(--okb);color:#0b5a36}.msg.aviso{background:var(--avb);color:#6b4b00}
+.links{margin-top:18px;font-size:14px;color:var(--mu);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+a{color:var(--v2);font-weight:700}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+small.d{display:block;color:var(--mu);font-size:12px;margin-top:4px}
+@media(max-width:480px){.wrap{margin:14px auto}.card{padding:18px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body><div class="topo" style="display:flex;align-items:center;min-height:68px"><a href="/" aria-label="{{ app_nome }}" style="display:flex"><img src="/logo.png" alt="{{ app_nome }}" style="height:52px;width:auto;display:block;filter:brightness(0) invert(1)"></a></div><main class="wrap"><div class="card"><h1>Defina uma nova senha</h1><p class="sub">Digite o código que enviamos por e-mail.</p>{% for c, m in get_flashed_messages(with_categories=true) %}<div class="msg {{ c }}" role="alert">{{ m }}</div>{% endfor %}
+<form method="post" action="/redefinir"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label for="codigo">Código</label><input id="codigo" class="cod" type="text" name="codigo" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required autofocus>
+<label for="senha">Nova senha</label><input id="senha" type="password" name="senha" required minlength="8" autocomplete="new-password">
+<label for="confirmar">Repita a nova senha</label><input id="confirmar" type="password" name="confirmar" required minlength="8" autocomplete="new-password">
+<button class="full" type="submit">Salvar senha</button></form>
+<div class="links"><a href="/esqueci">Pedir outro código</a><a href="/login">Voltar</a></div></div></main></body></html>
